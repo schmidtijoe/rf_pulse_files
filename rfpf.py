@@ -15,10 +15,17 @@ class RF:
     bandwidth_in_Hz: float = 1000.0
     duration_in_us: int = 2000
     time_bandwidth: float = bandwidth_in_Hz * duration_in_us * 1e-6
-
-    amplitude: np.ndarray = np.zeros(duration_in_us)
-    phase: np.ndarray = np.zeros(duration_in_us)
     num_samples: int = duration_in_us
+
+    amplitude: np.ndarray = np.zeros(num_samples)
+    phase: np.ndarray = np.zeros(num_samples)
+
+    def __post_init__(self):
+        # check array sizes - for some reason this is not working properly when creating class with input args
+        if self.amplitude.shape[0] != self.num_samples:
+            self.amplitude = np.zeros(self.num_samples)
+        if self.phase.shape[0] != self.num_samples:
+            self.phase = np.zeros(self.num_samples)
 
     def set_shape_on_raster(self, raster_time):
         # interpolate shape to duration raster
@@ -37,9 +44,15 @@ class RF:
 
     def save(self, f_name: typing.Union[str, plib.Path]):
         p_name = plib.Path(f_name).absolute()
-        if p_name.parent.is_dir():
-            with open(p_name, "wb") as p_file:
-                pickle.dump(self, p_file)
+        # check existing
+        if p_name.suffixes:
+            p_name.parent.mkdir(parents=True, exist_ok=True)
+        else:
+            p_name.mkdir(parents=True, exist_ok=True)
+        if p_name.is_file():
+            p_name.unlink()
+        with open(p_name, "wb") as p_file:
+            pickle.dump(self, p_file)
 
     @classmethod
     def load(cls, f_name):
