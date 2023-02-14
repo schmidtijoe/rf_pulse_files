@@ -3,7 +3,6 @@ import logging
 
 import numpy as np
 import pathlib as plib
-import inspect
 import typing
 import pickle
 
@@ -11,7 +10,7 @@ logModule = logging.getLogger(__name__)
 
 
 @dc.dataclass
-class ExtRf:
+class RF:
     filename: str = ""
     bandwidth_in_Hz: float = 1000.0
     duration_in_us: int = 2000
@@ -19,6 +18,7 @@ class ExtRf:
 
     amplitude: np.ndarray = np.zeros(duration_in_us)
     phase: np.ndarray = np.zeros(duration_in_us)
+    num_samples: int = duration_in_us
 
     def set_shape_on_raster(self, raster_time):
         # interpolate shape to duration raster
@@ -33,6 +33,7 @@ class ExtRf:
             np.arange(self.phase.shape[0]),
             self.phase
         )
+        self.num_samples = N
 
     def save(self, f_name: typing.Union[str, plib.Path]):
         p_name = plib.Path(f_name).absolute()
@@ -102,6 +103,7 @@ class ExtRf:
                 logModule.info(f"file content not matching number of samples given {num_samples}")
                 num_samples = content.__len__() - start_count
                 logModule.info(f"adjusting number of samples to {num_samples}")
+                rf_cls.num_samples = num_samples
             content = content[start_count:start_count+num_samples]
             temp_amp = np.array([line.strip().split('\t')[0] for line in content])
             temp_phase = np.array([line.strip().split('\t')[1] for line in content])
@@ -120,13 +122,16 @@ class ExtRf:
     def set_duration_us(self, duration: int):
         self.duration_in_us = duration
 
+    def get_num_samples(self):
+        return self.num_samples
+
 
 if __name__ == '__main__':
-    rf = ExtRf()
+    rf = RF()
     s_path = plib.Path("pulses/test.pkl").absolute()
     rf.save(s_path)
 
-    rf_l = ExtRf.load(s_path)
+    rf_l = RF.load(s_path)
 
-    rf_t = ExtRf.load_from_txt("pulses/semc_pulse.txt", bandwidth_in_Hz=1192.1694, duration_in_us=1801)
+    rf_t = RF.load_from_txt("pulses/semc_pulse.txt", bandwidth_in_Hz=1192.1694, duration_in_us=1801)
     a = rf
