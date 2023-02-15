@@ -5,6 +5,7 @@ import numpy as np
 import pathlib as plib
 import typing
 import pickle
+import pandas as pd
 
 logModule = logging.getLogger(__name__)
 
@@ -19,6 +20,16 @@ class RF:
 
     amplitude: np.ndarray = np.zeros(num_samples)
     phase: np.ndarray = np.zeros(num_samples)
+
+    def __str__(self):
+        columns = {
+            "Bandwidth": ["Hz", self.bandwidth_in_Hz],
+            "Duration": ["us", self.duration_in_us],
+            "Time-Bandwidth": ["1", self.time_bandwidth],
+            "Number of Samples": ["1", self.num_samples]
+        }
+        display = pd.DataFrame(columns, index=["units", "value"])
+        print(display)
 
     def __post_init__(self):
         # check array sizes - for some reason this is not working properly when creating class with input args
