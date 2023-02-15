@@ -116,6 +116,14 @@ class RF:
             raise AttributeError(err)
         return rf_cls
 
+    def resample_to_duration(self, duration_in_us: int):
+        # want to use pulse with different duration,
+        # ! in general time bandwidth properties do not have to go linearly with duration
+        # we have a pulse with given tb prod at given duration,
+        # if we change the duration the bandwidth is expected to change accordingly
+        self.set_bandwidth_Hz(self.time_bandwidth / duration_in_us * 1e6)
+        self.set_duration_us(duration=duration_in_us)
+
     def set_bandwidth_Hz(self, bw: float):
         self.bandwidth_in_Hz = bw
 
