@@ -21,7 +21,7 @@ class RF:
     amplitude: np.ndarray = np.zeros(num_samples)
     phase: np.ndarray = np.zeros(num_samples)
 
-    def __str__(self):
+    def display(self):
         columns = {
             "Bandwidth": ["Hz", self.bandwidth_in_Hz],
             "Duration": ["us", self.duration_in_us],
