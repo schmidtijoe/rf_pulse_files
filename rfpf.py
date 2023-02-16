@@ -22,7 +22,7 @@ class GlobalSystem:
 
 @dc.dataclass
 class RF:
-    filename: str = ""
+    name: str = ""
     bandwidth_in_Hz: float = 1000.0
     duration_in_us: float = 2000.0
     time_bandwidth: float = bandwidth_in_Hz * duration_in_us * 1e-6
