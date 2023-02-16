@@ -144,10 +144,22 @@ class RF:
 
             rf_cls.amplitude = temp_amp
             rf_cls.phase = temp_phase
+        else:
+            err = f"no file ({t_name}) found or non valid file type"
+            logModule.error(err)
+            raise AttributeError(err)
         if rf_cls.amplitude.shape[0] != rf_cls.phase.shape[0]:
             err = "shape of amplitude and phase do not match"
             logModule.error(err)
             raise AttributeError(err)
+        if rf_cls.duration_in_us < rf_cls.num_samples:
+            info = f"loaded content, i.e. number of samples {rf_cls.num_samples}, " \
+                   f"set duration: {rf_cls.duration_in_us:.1f}.\n" \
+                   f"-> sub us sampling. We crop the arrays to make them sampled per us ({int(rf_cls.duration_in_us)})"
+            logModule.info(info)
+            rf_cls.amplitude = rf_cls.amplitude[:int(rf_cls.duration_in_us)]
+            rf_cls.phase = rf_cls.phase[:int(rf_cls.duration_in_us)]
+            rf_cls.num_samples = int(rf_cls.duration_in_us)
         return rf_cls
 
     def resample_to_duration(self, duration_in_us: int):
