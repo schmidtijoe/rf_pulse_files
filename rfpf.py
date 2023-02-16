@@ -170,6 +170,9 @@ class RF:
     def get_dt_sampling_in_s(self) -> float:
         return 1e-6 * self.duration_in_us / self.num_samples
 
+    def get_dt_sampling_in_us(self) -> float:
+        return self.duration_in_us / self.num_samples
+
 
 if __name__ == '__main__':
     rf = RF()
