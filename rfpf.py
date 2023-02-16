@@ -11,6 +11,16 @@ logModule = logging.getLogger(__name__)
 
 
 @dc.dataclass
+class GlobalSystem:
+    gamma_Hz = 42577478.518     # Hz/T
+    max_grad_mT = 40.0          # mT/m
+
+    def check_bandwidth_for_slice(self, slice_thickness_in_mm):
+        max_bandwidth = self.gamma_Hz * self.max_grad_mT * 1e-3 * slice_thickness_in_mm * 1e-3
+        return max_bandwidth
+        
+
+@dc.dataclass
 class RF:
     filename: str = ""
     bandwidth_in_Hz: float = 1000.0
@@ -21,7 +31,14 @@ class RF:
     amplitude: np.ndarray = np.zeros(num_samples)
     phase: np.ndarray = np.zeros(num_samples)
 
-    def __str__(self):
+    def __post_init__(self):
+        # check array sizes - for some reason this is not working properly when creating class with input args
+        if self.amplitude.shape[0] != self.num_samples:
+            self.amplitude = np.zeros(self.num_samples)
+        if self.phase.shape[0] != self.num_samples:
+            self.phase = np.zeros(self.num_samples)
+
+    def display(self):
         columns = {
             "Bandwidth": ["Hz", self.bandwidth_in_Hz],
             "Duration": ["us", self.duration_in_us],
@@ -30,13 +47,6 @@ class RF:
         }
         display = pd.DataFrame(columns, index=["units", "value"])
         print(display)
-
-    def __post_init__(self):
-        # check array sizes - for some reason this is not working properly when creating class with input args
-        if self.amplitude.shape[0] != self.num_samples:
-            self.amplitude = np.zeros(self.num_samples)
-        if self.phase.shape[0] != self.num_samples:
-            self.phase = np.zeros(self.num_samples)
 
     def set_shape_on_raster(self, raster_time):
         # interpolate shape to duration raster
