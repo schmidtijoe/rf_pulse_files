@@ -24,9 +24,9 @@ class GlobalSystem:
 class RF:
     filename: str = ""
     bandwidth_in_Hz: float = 1000.0
-    duration_in_us: int = 2000
+    duration_in_us: float = 2000.0
     time_bandwidth: float = bandwidth_in_Hz * duration_in_us * 1e-6
-    num_samples: int = duration_in_us
+    num_samples: int = int(duration_in_us)
 
     amplitude: np.ndarray = np.zeros(num_samples)
     phase: np.ndarray = np.zeros(num_samples)
