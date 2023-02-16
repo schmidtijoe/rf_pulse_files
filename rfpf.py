@@ -154,8 +154,11 @@ class RF:
     def set_duration_us(self, duration: int):
         self.duration_in_us = duration
 
-    def get_num_samples(self):
+    def get_num_samples(self) -> int:
         return self.num_samples
+
+    def get_dt_sampling_in_s(self) -> float:
+        return 1e-6 * self.duration_in_us / self.num_samples
 
 
 if __name__ == '__main__':
