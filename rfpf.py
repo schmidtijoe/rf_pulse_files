@@ -81,6 +81,10 @@ class RF:
         if p_name.is_file():
             with open(p_name, "rb") as p_file:
                 rf_cls = pickle.load(p_file)
+        else:
+            err = f"No file {p_name} found"
+            logModule.error(err)
+            raise ValueError(err)
         return rf_cls
 
     @classmethod
@@ -139,8 +143,8 @@ class RF:
                 logModule.info(f"adjusting number of samples to {num_samples}")
                 rf_cls.num_samples = num_samples
             content = content[start_count:start_count+num_samples]
-            temp_amp = np.array([line.strip().split('\t')[0] for line in content])
-            temp_phase = np.array([line.strip().split('\t')[1] for line in content])
+            temp_amp = np.array([float(line.strip().split('\t')[0]) for line in content])
+            temp_phase = np.array([float(line.strip().split('\t')[1]) for line in content])
 
             rf_cls.amplitude = temp_amp
             rf_cls.phase = temp_phase
@@ -193,5 +197,9 @@ if __name__ == '__main__':
 
     rf_l = RF.load(s_path)
 
+    save_path = plib.Path("pulses/semc_rfpf.pkl").absolute()
     rf_t = RF.load_from_txt("pulses/semc_pulse.txt", bandwidth_in_Hz=1192.1694, duration_in_us=1801)
+    rf_t.save(save_path)
+
+    rf_lt = RF.load(save_path)
     a = rf
