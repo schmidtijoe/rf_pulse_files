@@ -108,16 +108,15 @@ class RF:
                 logModule.error(err)
                 raise ValueError
             bandwidth_in_Hz = time_bandwidth / duration_in_us * 1e6
-            rf_cls = cls(bandwidth_in_Hz=bandwidth_in_Hz, duration_in_us=duration_in_us)
         elif duration_in_us is None:
             if time_bandwidth is None:
                 err = f"No duration provided: provide Bandwidth and time-bandwidth product"
                 logModule.error(err)
                 raise ValueError
             duration_in_us = int(1e6 * time_bandwidth / bandwidth_in_Hz)
-            rf_cls = cls(bandwidth_in_Hz=bandwidth_in_Hz, duration_in_us=duration_in_us)
         else:
-            rf_cls = cls(bandwidth_in_Hz=bandwidth_in_Hz, duration_in_us=duration_in_us)
+            time_bandwidth = bandwidth_in_Hz * duration_in_us * 1e-6
+        rf_cls = cls(bandwidth_in_Hz=bandwidth_in_Hz, duration_in_us=duration_in_us, time_bandwidth=time_bandwidth)
         if num_samples is None:
             num_samples = duration_in_us
         t_name = plib.Path(f_name).absolute()
@@ -198,7 +197,7 @@ if __name__ == '__main__':
     rf_l = RF.load(s_path)
 
     save_path = plib.Path("pulses/semc_rfpf.pkl").absolute()
-    rf_t = RF.load_from_txt("pulses/semc_pulse.txt", bandwidth_in_Hz=1192.1694, duration_in_us=1801)
+    rf_t = RF.load_from_txt("pulses/GAUSS5120_B375.pta", bandwidth_in_Hz=375.0, duration_in_us=5120)
     rf_t.save(save_path)
 
     rf_lt = RF.load(save_path)
